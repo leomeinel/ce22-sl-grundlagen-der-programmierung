@@ -9,14 +9,13 @@
 
 #include <iostream>
 #include <span>
-#include <string>
 #include <string_view>
 
 int main(int argc, char *argv[]) {
   std::span<char *> parameters{argv, static_cast<uint32_t>(argc)};
 
-  std::string input_file;
-  std::string output_file;
+  std::string_view input_file;
+  std::string_view output_file;
 
   bool expected_input_file = false;
   bool expected_output_file = false;
