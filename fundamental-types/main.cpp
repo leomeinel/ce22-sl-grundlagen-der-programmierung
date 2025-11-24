@@ -9,33 +9,38 @@
 
 #include <cstdint>
 #include <iostream>
+#include <limits>
+#include <tuple>
 
-void print_type_details(auto var) {
+template <typename T>
+concept is_char_type =
+    std::is_same_v<T, char> || std::is_same_v<T, signed char> ||
+    std::is_same_v<T, unsigned char>;
+
+using int_tuple =
+    std::tuple<int, unsigned int, int8_t, uint8_t, unsigned long, uint64_t,
+               unsigned long long, long, int64_t, long long>;
+
+void print_int_details(auto &var) {
+  using T = std::remove_reference_t<decltype(var)>;
+
+  constexpr auto min = (is_char_type<T>)
+                           ? static_cast<int>(std::numeric_limits<T>::min())
+                           : std::numeric_limits<T>::min();
+  constexpr auto max = (is_char_type<T>)
+                           ? static_cast<int>(std::numeric_limits<T>::max())
+                           : std::numeric_limits<T>::max();
+
   std::cout << "TypeID: " << typeid(var).name() << "; Size: " << sizeof(var)
-            << "b" << "\n";
-  // TODO: Also print max_value();
+            << "b"
+            << "; Minimum value: " << min << "; Maximum value: " << max << "\n";
 }
 
-struct int_struct {
-  const int int_;
-  const unsigned int unsigned_int_;
-  const int8_t int8_t_;
-  const uint8_t uint8_t_;
-  // INFO: Can also use long long
-  const unsigned long unsigned_long_;
-  const uint64_t uint64_t_;
-  const unsigned long long unsigned_long_long_;
-};
-
 int main(int argc, char *argv[]) {
-  int_struct int_struct_ = {0, 1, 2, 3, 4, 5, 6};
-  print_type_details(int_struct_.int_);
-  print_type_details(int_struct_.unsigned_int_);
-  print_type_details(int_struct_.int8_t_);
-  print_type_details(int_struct_.uint8_t_);
-  print_type_details(int_struct_.unsigned_long_);
-  print_type_details(int_struct_.uint64_t_);
-  print_type_details(int_struct_.unsigned_long_long_);
+  int_tuple integer_types;
+
+  std::apply([](auto &&...args) { ((print_int_details(args)), ...); },
+             integer_types);
 
   return 0;
 }
