@@ -8,13 +8,10 @@
  */
 
 #include <cstdint>
+#include <iomanip>
 #include <iostream>
 #include <limits>
 #include <tuple>
-
-/**
-
- */
 
 /**
  * @brief Concept that checks if type T is derived from any char type
@@ -63,11 +60,10 @@ concept derived_from_any_char =
     std::derived_from<T, unsigned char>;
 
 /**
-
- */
-
-/**
- * @brief Type-alias that contains multiple integer types
+ * @brief Type-alias that contains multiple integral types
+ *
+ * For integral types see: https://en.cppreference.com/w/cpp/types/integer.html
+ * and https://en.cppreference.com/w/cpp/language/types.html#Integral_types
  *
  * https://en.cppreference.com/w/cpp/language/type_alias.html
  *
@@ -106,18 +102,48 @@ concept derived_from_any_char =
  * to the result of substituting the template arguments of the alias template
  * for the template parameters in the type-id.
  */
-using int_tuple =
-    std::tuple<int, unsigned int, int8_t, uint8_t, unsigned long, uint64_t,
-               unsigned long long, long, int64_t, long long>;
+using integral_types =
+    std::tuple<signed char, unsigned char, short int, unsigned short int, int,
+               unsigned int, long int, unsigned long int, long long int,
+               unsigned long long int, int8_t, int16_t, int32_t, int64_t,
+               int_fast8_t, int_fast16_t, int_fast32_t, int_fast64_t,
+               int_least8_t, int_least16_t, int_least32_t, int_least64_t,
+               intmax_t, intptr_t, uint8_t, uint16_t, uint32_t, uint64_t,
+               uint_fast8_t, uint_fast16_t, uint_fast32_t, uint_fast64_t,
+               uint_least8_t, uint_least16_t, uint_least32_t, uint_least64_t,
+               uintmax_t, uintptr_t>;
 
 /**
- * @brief Print details about the type of var
+ * @brief Type-alias that contains multiple floating-point types
  *
- * This is not type checked but meant for numeric types, specifically integers.
+ * For floating-point types see:
+ * https://en.cppreference.com/w/cpp/types/floating-point.html and
+ * https://en.cppreference.com/w/cpp/language/types.html#Floating-point_types
+ */
+using floating_point_types = std::tuple<float, double, long double>;
+
+/**
+ * @brief Print table with type details
+ *
+ * @param type_id ID of type
+ * @param size Size of type
+ * @param min Minimum value of type
+ * @param max Maximum value of type
+ */
+void print_type_table(std::string_view type_id, std::string size, auto &min,
+                      auto &max) {
+  std::cout << std::left << std::setw(9) << "type_id:" << std::setw(2)
+            << type_id << "" << std::setw(6) << "size:" << std::setw(4)
+            << size + "b" << std::setw(5) << "min:" << std::setw(21) << min
+            << "" << std::setw(5) << "max:" << std::setw(21) << max << "\n";
+}
+
+/**
+ * @brief Print details about the type of numeric var
  *
  * @param target Target variable
  */
-void print_int_details(auto &target) {
+void print_type_details_num(auto &target) {
   // We have to remove reference here because type T needs to be initialized
   using T = std::remove_reference_t<decltype(target)>;
 
@@ -131,9 +157,9 @@ void print_int_details(auto &target) {
                            : std::numeric_limits<T>::max();
 
   // Print details
-  std::cout << "TypeID: " << typeid(target).name()
-            << "; Size: " << sizeof(target) << "b"
-            << "; Minimum value: " << min << "; Maximum value: " << max << "\n";
+  const std::string_view type_id = typeid(target).name();
+  const std::string size = std::to_string(sizeof(target));
+  print_type_table(type_id, size, min, max);
 }
 
 /**
@@ -145,11 +171,14 @@ void print_int_details(auto &target) {
  */
 int main(int argc, char *argv[]) {
   // Initialize tuples
-  int_tuple integer_types;
+  integral_types integrals;
+  floating_point_types floating_points;
 
   // Loop through integer tuple
-  std::apply([](auto &&...args) { ((print_int_details(args)), ...); },
-             integer_types);
+  std::apply([](auto &&...args) { ((print_type_details_num(args)), ...); },
+             integrals);
+  std::apply([](auto &&...args) { ((print_type_details_num(args)), ...); },
+             floating_points);
 
   return 0;
 }
