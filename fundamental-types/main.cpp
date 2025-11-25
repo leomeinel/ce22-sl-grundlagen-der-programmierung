@@ -24,10 +24,10 @@
  *
  * https://en.cppreference.com/w/cpp/language/templates.html#Syntax
  *
- * - (1) `template <parameter-list > requires-clause (optional) declaration`
- * - (2) `export template<parameter-list > declaration` (until C++11)
+ * - (1) `template <parameter-list> requires-clause(optional) declaration`
+ * - (2) `export template<parameter-list> declaration` (until C++11)
  * - (3) (since C++20) `template <parameter-list> concept concept-name =
- * constraint-expression ;` (used here)
+ * constraint-expression;` (used here)
  *
  * - `parameter-list`: a non-empty comma-separated list of the template
  * parameters, each of which is either constant parameter, a type parameter, a
@@ -73,11 +73,11 @@ concept derived_from_any_char =
  *
  * https://en.cppreference.com/w/cpp/language/type_alias.html#Syntax
  *
- * - (1) `using identifier attr (optional) = type-id;` (used here)
- * - (2) `template <template-parameter-list> using identifier attr (optional) =
+ * - (1) `using identifier attr(optional) = type-id;` (used here)
+ * - (2) `template <template-parameter-list> using identifier attr(optional) =
  * type-id;`
  * - (3) (since C++20) `template <template-parameter-list> requires constraint
- * using identifier attr (optional) = type-id;`
+ * using identifier attr(optional) = type-id;`
  *
  * - `attr`: optional sequence of any number of attributes
  * - `identifier`: the name that is introduced by this declaration, which
