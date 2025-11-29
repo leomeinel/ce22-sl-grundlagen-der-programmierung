@@ -11,6 +11,7 @@
 #include <iomanip>
 #include <iostream>
 #include <limits>
+#include <sstream>
 #include <tuple>
 
 /**
@@ -161,7 +162,7 @@ namespace
    * @param min Minimum value of type
    * @param max Maximum value of type
    */
-  void print_type_table(std::string_view type_id, std::string_view size, std::string_view min, std::string_view max)
+  void print_type_table(std::string_view type_id, const std::string& size, const std::string& min, const std::string& max)
   {
     constexpr std::string_view TYPE_ID_LABEL = "type_id:";
     constexpr uint8_t TYPE_ID_MAX_SIZE = 1;
@@ -175,7 +176,7 @@ namespace
 
     std::cout << std::left << std::setw(TYPE_ID_LABEL.size() + COLUMN_SPACING) << TYPE_ID_LABEL
               << std::setw(TYPE_ID_MAX_SIZE + COLUMN_SPACING) << type_id << std::setw(SIZE_LABEL.size() + COLUMN_SPACING)
-              << SIZE_LABEL << std::setw(SIZE_MAX_SIZE + COLUMN_SPACING) << size << "b"
+              << SIZE_LABEL << std::setw(SIZE_MAX_SIZE + COLUMN_SPACING) << size + 'b'
               << std::setw(MIN_LABEL.size() + COLUMN_SPACING) << MIN_LABEL << std::setw(MIN_MAX_SIZE + COLUMN_SPACING) << min
               << std::setw(MAX_LABEL.size() + COLUMN_SPACING) << MAX_LABEL << std::setw(MAX_MAX_SIZE + COLUMN_SPACING) << max
               << "\n";
@@ -193,17 +194,18 @@ namespace
 
     // Get min/max value of target. We need to `static_cast<int>()` if the type is
     // not actually numeric.
-    const std::string min_string = std::to_string(
-        (derived_from_any_char<T>) ? static_cast<int>(std::numeric_limits<T>::min()) : std::numeric_limits<T>::min());
-    const std::string max_string = std::to_string(
-        (derived_from_any_char<T>) ? static_cast<int>(std::numeric_limits<T>::max()) : std::numeric_limits<T>::max());
+    std::ostringstream min_oss;
+    min_oss
+        << ((derived_from_any_char<T>) ? static_cast<int>(std::numeric_limits<T>::min()) : std::numeric_limits<T>::min());
+    std::ostringstream max_oss;
+    max_oss
+        << ((derived_from_any_char<T>) ? static_cast<int>(std::numeric_limits<T>::max()) : std::numeric_limits<T>::max());
 
     // Print details
     const std::string_view type_id = typeid(target).name();
-    const std::string size_string = std::to_string(sizeof(target));
-    const std::string_view size = size_string;
-    const std::string_view min = min_string;
-    const std::string_view max = max_string;
+    const std::string size = std::to_string(sizeof(target));
+    const std::string min = min_oss.str();
+    const std::string max = max_oss.str();
     print_type_table(type_id, size, min, max);
   }
 
