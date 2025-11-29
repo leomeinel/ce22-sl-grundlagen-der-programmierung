@@ -51,11 +51,11 @@ int main(int argc, char** argv)
   // std::vector<std::string>::iterator it;
 #pragma unroll 2
   // NOLINTBEGIN(modernize-loop-convert)
-  for (auto it = pi_hosts.begin(); it != pi_hosts.end(); it++)
+  for (auto iter = pi_hosts.begin(); iter != pi_hosts.end(); iter++)
   {
-    if (*it == "192.168.0.101")
+    if (*iter == "192.168.0.101")
     {
-      *it = "192.168.1.101";
+      *iter = "192.168.1.101";
       break;
     }
   }
