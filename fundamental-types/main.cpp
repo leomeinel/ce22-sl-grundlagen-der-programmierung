@@ -54,10 +54,9 @@
  *
  * @tparam T Any type
  */
-template <typename T>
+template<typename T>
 concept derived_from_any_char =
-    std::derived_from<T, char> || std::derived_from<T, signed char> ||
-    std::derived_from<T, unsigned char>;
+    std::derived_from<T, char> || std::derived_from<T, signed char> || std::derived_from<T, unsigned char>;
 
 /**
  * @brief Type-alias that contains multiple integral types
@@ -102,16 +101,45 @@ concept derived_from_any_char =
  * to the result of substituting the template arguments of the alias template
  * for the template parameters in the type-id.
  */
-using integral_types =
-    std::tuple<signed char, unsigned char, short int, unsigned short int, int,
-               unsigned int, long int, unsigned long int, long long int,
-               unsigned long long int, int8_t, int16_t, int32_t, int64_t,
-               int_fast8_t, int_fast16_t, int_fast32_t, int_fast64_t,
-               int_least8_t, int_least16_t, int_least32_t, int_least64_t,
-               intmax_t, intptr_t, uint8_t, uint16_t, uint32_t, uint64_t,
-               uint_fast8_t, uint_fast16_t, uint_fast32_t, uint_fast64_t,
-               uint_least8_t, uint_least16_t, uint_least32_t, uint_least64_t,
-               uintmax_t, uintptr_t>;
+using integral_types = std::tuple<
+    signed char,
+    unsigned char,
+    short int,
+    unsigned short int,
+    int,
+    unsigned int,
+    long int,
+    unsigned long int,
+    long long int,
+    unsigned long long int,
+    int8_t,
+    int16_t,
+    int32_t,
+    int64_t,
+    int_fast8_t,
+    int_fast16_t,
+    int_fast32_t,
+    int_fast64_t,
+    int_least8_t,
+    int_least16_t,
+    int_least32_t,
+    int_least64_t,
+    intmax_t,
+    intptr_t,
+    uint8_t,
+    uint16_t,
+    uint32_t,
+    uint64_t,
+    uint_fast8_t,
+    uint_fast16_t,
+    uint_fast32_t,
+    uint_fast64_t,
+    uint_least8_t,
+    uint_least16_t,
+    uint_least32_t,
+    uint_least64_t,
+    uintmax_t,
+    uintptr_t>;
 
 /**
  * @brief Type-alias that contains multiple floating-point types
@@ -122,45 +150,64 @@ using integral_types =
  */
 using floating_point_types = std::tuple<float, double, long double>;
 
-/**
- * @brief Print table with type details
- *
- * @param type_id ID of type
- * @param size Size of type
- * @param min Minimum value of type
- * @param max Maximum value of type
- */
-void print_type_table(std::string_view type_id, std::string size, auto &min,
-                      auto &max) {
-  std::cout << std::left << std::setw(9) << "type_id:" << std::setw(2)
-            << type_id << "" << std::setw(6) << "size:" << std::setw(4)
-            << size + "b" << std::setw(5) << "min:" << std::setw(21) << min
-            << "" << std::setw(5) << "max:" << std::setw(21) << max << "\n";
-}
+namespace
+{
 
-/**
- * @brief Print details about the type of numeric var
- *
- * @param target Target variable
- */
-void print_type_details_num(auto &target) {
-  // We have to remove reference here because type T needs to be initialized
-  using T = std::remove_reference_t<decltype(target)>;
+  /**
+   * @brief Print table with type details
+   *
+   * @param type_id ID of type
+   * @param size Size of type
+   * @param min Minimum value of type
+   * @param max Maximum value of type
+   */
+  void print_type_table(std::string_view type_id, std::string_view size, std::string_view min, std::string_view max)
+  {
+    constexpr std::string_view TYPE_ID_LABEL = "type_id:";
+    constexpr uint8_t TYPE_ID_MAX_SIZE = 1;
+    constexpr std::string_view SIZE_LABEL = "size:";
+    constexpr uint8_t SIZE_MAX_SIZE = 3;
+    constexpr std::string_view MIN_LABEL = "min:";
+    constexpr uint8_t MIN_MAX_SIZE = 20;
+    constexpr std::string_view MAX_LABEL = "max:";
+    constexpr uint8_t MAX_MAX_SIZE = 20;
+    constexpr uint8_t COLUMN_SPACING = 1;
 
-  // Get min/max value of target. We need to `static_cast<int>()` if the type is
-  // not actually numeric.
-  constexpr auto min = (derived_from_any_char<T>)
-                           ? static_cast<int>(std::numeric_limits<T>::min())
-                           : std::numeric_limits<T>::min();
-  constexpr auto max = (derived_from_any_char<T>)
-                           ? static_cast<int>(std::numeric_limits<T>::max())
-                           : std::numeric_limits<T>::max();
+    std::cout << std::left << std::setw(TYPE_ID_LABEL.size() + COLUMN_SPACING) << TYPE_ID_LABEL
+              << std::setw(TYPE_ID_MAX_SIZE + COLUMN_SPACING) << type_id << std::setw(SIZE_LABEL.size() + COLUMN_SPACING)
+              << SIZE_LABEL << std::setw(SIZE_MAX_SIZE + COLUMN_SPACING) << size << "b"
+              << std::setw(MIN_LABEL.size() + COLUMN_SPACING) << MIN_LABEL << std::setw(MIN_MAX_SIZE + COLUMN_SPACING) << min
+              << std::setw(MAX_LABEL.size() + COLUMN_SPACING) << MAX_LABEL << std::setw(MAX_MAX_SIZE + COLUMN_SPACING) << max
+              << "\n";
+  }
 
-  // Print details
-  const std::string_view type_id = typeid(target).name();
-  const std::string size = std::to_string(sizeof(target));
-  print_type_table(type_id, size, min, max);
-}
+  /**
+   * @brief Print details about the type of numeric var
+   *
+   * @param target Target variable
+   */
+  void print_type_details_num(auto& target)
+  {
+    // We have to remove reference here because type T needs to be initialized
+    using T = std::remove_reference_t<decltype(target)>;
+
+    // Get min/max value of target. We need to `static_cast<int>()` if the type is
+    // not actually numeric.
+    const std::string min_string = std::to_string(
+        (derived_from_any_char<T>) ? static_cast<int>(std::numeric_limits<T>::min()) : std::numeric_limits<T>::min());
+    const std::string max_string = std::to_string(
+        (derived_from_any_char<T>) ? static_cast<int>(std::numeric_limits<T>::max()) : std::numeric_limits<T>::max());
+
+    // Print details
+    const std::string_view type_id = typeid(target).name();
+    const std::string size_string = std::to_string(sizeof(target));
+    const std::string_view size = size_string;
+    const std::string_view min = min_string;
+    const std::string_view max = max_string;
+    print_type_table(type_id, size, min, max);
+  }
+
+}  // namespace
 
 /**
  * @brief Main class
@@ -169,16 +216,15 @@ void print_type_details_num(auto &target) {
  * @param argv List of arguments
  * @return int Success value
  */
-int main(int argc, char *argv[]) {
+int main(int /*argc*/, char* /*argv*/[])
+{
   // Initialize tuples
   integral_types integrals;
   floating_point_types floating_points;
 
   // Loop through integer tuple
-  std::apply([](auto &&...args) { ((print_type_details_num(args)), ...); },
-             integrals);
-  std::apply([](auto &&...args) { ((print_type_details_num(args)), ...); },
-             floating_points);
+  std::apply([](auto&&... args) { ((print_type_details_num(args)), ...); }, integrals);
+  std::apply([](auto&&... args) { ((print_type_details_num(args)), ...); }, floating_points);
 
   return 0;
 }
